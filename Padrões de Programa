@@ -1,0 +1,131 @@
+import java.util.HashMap;
+import java.util.Map;
+
+// Singleton para Gerenciamento de Banco de Dados
+public class DatabaseManager {
+    private static DatabaseManager instance;
+    private Map<String, String> compatibilidade; // Simulação de dados do banco
+
+    private DatabaseManager() {
+        // Simula um banco de dados com regras de compatibilidade
+        compatibilidade = new HashMap<>();
+        compatibilidade.put("CPU_GPU", "Compatível");
+        compatibilidade.put("CPU_RAM", "Compatível");
+        compatibilidade.put("CPU_Motherboard", "Compatível");
+        compatibilidade.put("GPU_RAM", "Incompatível");
+        System.out.println("Conexão ao Banco de Dados estabelecida.");
+    }
+
+    public static DatabaseManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseManager();
+        }
+        return instance;
+    }
+
+    public String verificarCompatibilidade(String c1, String c2) {
+        return compatibilidade.getOrDefault(c1 + "_" + c2, "Desconhecida");
+    }
+}
+
+// Factory para Criação de Componentes
+abstract class Componente {
+    protected String nome;
+    protected String especificacoes;
+
+    public String getDetalhes() {
+        return "Nome: " + nome + ", Especificações: " + especificacoes;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+}
+
+class CPU extends Componente {
+    public CPU(String especificacoes) {
+        this.nome = "CPU";
+        this.especificacoes = especificacoes;
+    }
+}
+
+class GPU extends Componente {
+    public GPU(String especificacoes) {
+        this.nome = "GPU";
+        this.especificacoes = especificacoes;
+    }
+}
+
+class RAM extends Componente {
+    public RAM(String especificacoes) {
+        this.nome = "RAM";
+        this.especificacoes = especificacoes;
+    }
+}
+
+class Motherboard extends Componente {
+    public Motherboard(String especificacoes) {
+        this.nome = "Motherboard";
+        this.especificacoes = especificacoes;
+    }
+}
+
+class ComponenteFactory {
+    public static Componente criarComponente(String tipo, String especificacoes) {
+        switch (tipo.toLowerCase()) {
+            case "cpu":
+                return new CPU(especificacoes);
+            case "gpu":
+                return new GPU(especificacoes);
+            case "ram":
+                return new RAM(especificacoes);
+            case "motherboard":
+                return new Motherboard(especificacoes);
+            default:
+                throw new IllegalArgumentException("Tipo de componente desconhecido: " + tipo);
+        }
+    }
+}
+
+// Classe para integração com API externa (simulada)
+class APIOfertaExterna {
+    public static void buscarOfertas(String componente) {
+        // Simulação de busca de ofertas externas
+        System.out.println("Buscando ofertas para: " + componente);
+        System.out.println("Oferta encontrada: " + componente + " - R$ 1.200 na LojaX");
+    }
+}
+
+// Classe Principal do Sistema
+public class PCBuild {
+    public static void main(String[] args) {
+        // Uso do Singleton
+        DatabaseManager dbManager = DatabaseManager.getInstance();
+
+        // Uso do Factory
+        Componente cpu = ComponenteFactory.criarComponente("cpu", "Intel Core i7, 3.8 GHz");
+        Componente gpu = ComponenteFactory.criarComponente("gpu", "NVIDIA RTX 3080, 10GB");
+        Componente ram = ComponenteFactory.criarComponente("ram", "DDR4, 16GB, 3200MHz");
+        Componente motherboard = ComponenteFactory.criarComponente("motherboard", "ASUS Z690, LGA 1700");
+
+        System.out.println(cpu.getDetalhes());
+        System.out.println(gpu.getDetalhes());
+        System.out.println(ram.getDetalhes());
+        System.out.println(motherboard.getDetalhes());
+
+        // Verificação de Compatibilidade Avançada
+        verificarCompatibilidade(dbManager, cpu, gpu);
+        verificarCompatibilidade(dbManager, cpu, ram);
+        verificarCompatibilidade(dbManager, gpu, ram);
+
+        // Integração com API de Ofertas
+        APIOfertaExterna.buscarOfertas("GPU NVIDIA RTX 3080");
+        APIOfertaExterna.buscarOfertas("RAM DDR4 16GB");
+    }
+
+    public static void verificarCompatibilidade(DatabaseManager dbManager, Componente c1, Componente c2) {
+        String resultado = dbManager.verificarCompatibilidade(c1.getNome(), c2.getNome());
+        System.out.println("Verificando compatibilidade entre: " + c1.getNome() + " e " + c2.getNome());
+        System.out.println("Resultado: " + resultado);
+    }
+}
